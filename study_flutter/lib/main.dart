@@ -37,8 +37,8 @@ class _MyHomePageState extends State<MyApp> {
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme(
           Theme.of(context).textTheme.apply(
-                bodyColor: Colors.white,
-                displayColor: Colors.white,
+                bodyColor: Colors.black,
+                displayColor: Colors.black,
               ),
         ),
         brightness: Brightness.light,

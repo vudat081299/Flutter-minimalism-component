@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+
 import 'package:study_flutter/components/minimalism_textfield.dart';
 import 'package:study_flutter/models/ticket_manager.dart';
+import 'package:study_flutter/xteam_dev/components/xt_loading_indicator.dart';
+import 'package:study_flutter/xteam_dev/doing_delivery_order.dart';
+import 'package:study_flutter/xteam_dev/doing_pickup_order.dart';
+
 import 'components/minimalism_button.dart';
 import 'components/minimalism_dialog.dart';
-import 'package:flutter/services.dart';
 
 class DetailAndEditTicket extends StatefulWidget {
   final Ticket ticket;
@@ -34,6 +39,8 @@ class _AddTicketState extends State<DetailAndEditTicket> {
   final DateTime _lastDate = DateTime(DateTime.now().year + 1);
 
   int _selectedTypeIndex = 0;
+
+  bool isLoading = true;
 
   String formatDate(DateTime? dateTime) {
     if (dateTime == null) {
@@ -79,43 +86,69 @@ class _AddTicketState extends State<DetailAndEditTicket> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(0.0),
           child: Column(
             children: [
-              _buildTicketTypeChoiceChip(),
-              const SizedBox(height: 16.0),
-              MinimalismTextField(label: 'Ticket Label', controller: _labelController),
-              const SizedBox(height: 16.0),
-              MinimalismTextField(label: 'Description', controller: _descriptionController),
-              const SizedBox(height: 16.0),
-              Row(
-                children: [
-                  Expanded(
-                    child: MinimalismTextField(label: 'Amount', controller: _amountController, suffixText: 'VNĐ',
-                        hintText: null, textInputType: TextInputType.number),
-                  ),
-                  const SizedBox(width: 8.0),
-                  SizedBox(
-                    height: 50.0,
-                    child: ElevatedButton(
-                      onPressed: () => _selectDate(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        formatDate(_selectedDate),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
+              // _buildTicketTypeChoiceChip(),
+              // const SizedBox(height: 16.0),
+              // MinimalismTextField(label: 'Ticket Label', controller: _labelController),
+              // const SizedBox(height: 16.0),
+              // MinimalismTextField(label: 'Description', controller: _descriptionController),
+              // const SizedBox(height: 16.0),
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: MinimalismTextField(label: 'Amount', controller: _amountController, suffixText: 'VNĐ',
+              //           hintText: null, textInputType: TextInputType.number),
+              //     ),
+              //     const SizedBox(width: 8.0),
+              //     SizedBox(
+              //       height: 50.0,
+              //       child: ElevatedButton(
+              //         onPressed: () => _selectDate(context),
+              //         style: ElevatedButton.styleFrom(
+              //           backgroundColor: Colors.black,
+              //           shape: const RoundedRectangleBorder(
+              //             borderRadius: BorderRadius.zero,
+              //           ),
+              //           elevation: 0,
+              //         ),
+              //         child: Text(
+              //           formatDate(_selectedDate),
+              //           style: const TextStyle(color: Colors.white),
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // _buildOrderTag(),
+              // WrapWithVariableWidthItems(),
+              // GridViewWithVariableWidthItems(),
+              // ListViewWithVariableWidthItems(),
+              // GridViewWithVariableWidthItems2(),
+              DoingPickupOrder(
+                data: DoingPickupOrderModel(),
               ),
-              const Spacer(),
-              _buildSubmitButton(),
+              DoingDeliveryOrder(
+                data: DoingDeliveryOrderModel(),
+              ),
+              // XtLoadingIndicator(
+              //   child: Text('day la noi dung',
+              //       style: TextStyle(color: Colors.black)),
+              //   isLoading: isLoading,
+              // ),
+              // GridViewWithVariableWidthItems(),
+              // ListViewWithVariableWidthItems(),
+              // GridViewWithVariableWidthItems2(),
+              // TextButton(
+              //     onPressed: () {
+              //       setState(() {
+              //         isLoading = !isLoading;
+              //       });
+              //     },
+              //     child: Text('button'))
+              // const Spacer(),
+              // _buildSubmitButton(),
             ],
           ),
         ),
@@ -230,6 +263,240 @@ class _AddTicketState extends State<DetailAndEditTicket> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildOrderTag() {
+    // return WrapWithVariableWidthItems();
+    // return GridViewWithVariableWidthItems();
+    // return ListViewWithVariableWidthItems();
+    return GridViewWithVariableWidthItems2();
+  }
+}
+
+class WrapWithVariableWidthItems extends StatelessWidget {
+  final List<String> items = [
+    'Short',
+    'This is a longer text',
+    'Even longer text here',
+    'Shorter',
+    'Another example',
+    'A very very long text that will take up more space',
+    'Small',
+    'Medium',
+    'Longest text in this list',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8.0, // Khoảng cách giữa các item ngang
+      runSpacing: 8.0, // Khoảng cách giữa các dòng
+      children: items.map((item) {
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+          decoration: BoxDecoration(
+            color: Colors.blue[200],
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Text(
+            item,
+            style: TextStyle(fontSize: 16.0),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class GridViewWithVariableWidthItems extends StatefulWidget {
+  @override
+  _GridViewWithVariableWidthItemsState createState() =>
+      _GridViewWithVariableWidthItemsState();
+}
+
+class _GridViewWithVariableWidthItemsState
+    extends State<GridViewWithVariableWidthItems> {
+  final List<String> items = [
+    'Short',
+    'This is a longer text',
+    'Even longer text here',
+    'Shorter',
+    'Another example',
+    'A very very long text that will take up more space',
+    'Small',
+    'Medium',
+    'Longest text in this list',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 200,
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200.0, // Chiều rộng tối đa cho mỗi phần tử
+          crossAxisSpacing: 8.0, // Khoảng cách giữa các phần tử ngang
+          mainAxisSpacing: 8.0, // Khoảng cách giữa các phần tử dọc
+        ),
+        itemCount: items.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            decoration: BoxDecoration(
+              color: Colors.blue[200],
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Text(
+              items[index],
+              style: TextStyle(fontSize: 16.0),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class ListViewWithVariableWidthItems extends StatelessWidget {
+  final List<String> items = [
+    'Short',
+    'This is a longer text',
+    'Even longer text here',
+    'Shorter',
+    'Another example',
+    'A very very long text that will take up more space',
+    'Small',
+    'Medium',
+    'Longest text in this list',
+    'Short',
+    'This is a longer text',
+    'Even longer text here',
+    'Shorter',
+    'Another example',
+    'A very very long text that will take up more space',
+    'Small',
+    'Medium',
+    'Longest text in this list',
+    'Short',
+    'This is a longer text',
+    'Even longer text here',
+    'Shorter',
+    'Another example',
+    'A very very long text that will take up more space',
+    'Small',
+    'Medium',
+    'Longest text in this list',
+    'Short',
+    'This is a longer text',
+    'Even longer text here',
+    'Shorter',
+    'Another example',
+    'A very very long text that will take up more space',
+    'Small',
+    'Medium',
+    'Longest text in this list',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 200,
+      child: ListView(
+        children: [
+          Wrap(
+            spacing: 8.0, // Khoảng cách giữa các item ngang
+            runSpacing: 8.0, // Khoảng cách giữa các dòng
+            children: items.map((item) {
+              return Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                decoration: BoxDecoration(
+                  color: Colors.blue[200],
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Text(
+                  item,
+                  style: TextStyle(fontSize: 16.0),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GridViewWithVariableWidthItems2 extends StatelessWidget {
+  final List<String> items = [
+    'Short',
+    'This is a longer text',
+    'Even longer text here',
+    'Shorter',
+    'Another example',
+    'A very very long text that will take up more space',
+    'Small',
+    'Medium',
+    'Longest text in this list',
+    'Short',
+    'This is a longer text',
+    'Even longer text here',
+    'Shorter',
+    'Another example',
+    'A very very long text that will take up more space',
+    'Small',
+    'Medium',
+    'Longest text in this list',
+    'Short',
+    'This is a longer text',
+    'Even longer text here',
+    'Shorter',
+    'Another example',
+    'A very very long text that will take up more space',
+    'Small',
+    'Medium',
+    'Longest text in this list',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 200,
+      child: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: EdgeInsets.all(8.0),
+            sliver: SliverToBoxAdapter(
+              child: Wrap(
+                spacing: 8.0, // Khoảng cách giữa các item ngang
+                runSpacing: 8.0, // Khoảng cách giữa các dòng
+                children: items.map((item) {
+                  return Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[200],
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Text(
+                      item,
+                      style: TextStyle(fontSize: 16.0),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
