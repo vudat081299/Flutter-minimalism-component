@@ -24,3 +24,5 @@ class WidgetSamples extends StatelessWidget {
     );
   }
 }
+
+// Test pull --rebase
