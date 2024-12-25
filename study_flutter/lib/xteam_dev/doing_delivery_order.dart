@@ -2,12 +2,14 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:study_flutter/xteam_dev/components/doing_action_bar.dart';
+import 'package:study_flutter/xteam_dev/components/date_extension.dart';
+import 'package:study_flutter/xteam_dev/components/order_action_bar.dart';
 import 'package:study_flutter/xteam_dev/components/rectangle_icon_button.dart';
 import 'package:study_flutter/xteam_dev/components/string_extension.dart';
 import 'package:study_flutter/xteam_dev/components/xt_common_row.dart';
 import 'package:study_flutter/xteam_dev/components/xt_common_row_type_3.dart';
 import 'package:study_flutter/xteam_dev/components/xt_common_row_type_6.dart';
+import 'package:study_flutter/xteam_dev/components/xt_package_helper.dart';
 import 'package:study_flutter/xteam_dev/components/xt_tag_grid.dart';
 import 'package:study_flutter/xteam_dev/components/xt_tag_model.dart';
 import 'package:study_flutter/xteam_dev/components/xt_tag_row.dart';
@@ -17,9 +19,11 @@ abstract class DoingDeliveryOrderData {
   String get alias;
   String get distance;
   bool get isShowReportKm;
+  bool get isPackageCollection;
   int get isXFast;
   bool get isPackageConnection;
   bool get isXfast2h;
+  String get packageLabel;
   String get brandTag;
   bool get isShowHvcvip;
   bool get needDeliverOnTime;
@@ -33,8 +37,17 @@ abstract class DoingDeliveryOrderData {
   int? get pickMoney;
   int get couponPickMoney;
   List<String> get productNames;
+  String get dateToDelayDeliver;
+  bool get isSlow;
+  int? get remainTime;
+  String? get maxEstimateTime; // Giao trước thời điểm này
+  String? get note;
+  String get deliverSession; // Hẹn giao
+  String get importStation;
   String? get imageUrl;
+  int? get isAvailable; // is enable complete button
   bool get isShowCheckCustomer;
+  bool get isShowQrAction;
 }
 
 class DoingDeliveryOrderModel implements DoingDeliveryOrderData {
@@ -48,11 +61,17 @@ class DoingDeliveryOrderModel implements DoingDeliveryOrderData {
   String get distance => '10';
 
   @override
-  int get isXFast => 1;
+  bool get isPackageCollection => true;
+
+  @override
+  int get isXFast => 0;
   @override
   bool get isPackageConnection => false;
   @override
   bool get isXfast2h => false;
+
+  @override
+  String get packageLabel => 'Thực phẩm tươi khô'; // Tag thực phẩm tươi/khô...
 
   @override
   String get brandTag => 'Brand';
@@ -90,13 +109,41 @@ class DoingDeliveryOrderModel implements DoingDeliveryOrderData {
   int get couponPickMoney => 10000;
 
   @override
-  List<String> get productNames => ['quan', 'ao', 'giay'];
+  List<String> get productNames =>
+      ['quan', 'ao', 'giay thep gai', 'giap cai', 'khien bang raduain'];
+
+  @override
+  String get dateToDelayDeliver => '14:00';
+
+  @override
+  bool get isSlow => true;
+
+  @override
+  int? get remainTime => 1200;
+
+  @override
+  String? get maxEstimateTime => '08:00';
+
+  @override
+  String? get note => 'Không để hàng hoá bị ướt';
+
+  @override
+  String get deliverSession => '2024-12-25 10:10:10';
+
+  @override
+  String get importStation => 'Tân phú trung';
 
   @override
   String? get imageUrl => 'https://';
 
   @override
+  int? get isAvailable => 1;
+
+  @override
   bool get isShowCheckCustomer => true;
+
+  @override
+  bool get isShowQrAction => true;
 }
 
 class DoingDeliveryOrder extends StatefulWidget {
@@ -140,6 +187,7 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
     final double estimateMapHeight = selfWidth * 0.50;
 
     //* Prepare data
+    bool isShowPackageForwardingTag = data.isPackageCollection;
     bool isShowXFastTag = true;
     String xFastTag = '';
     if (data.isPackageConnection) {
@@ -157,6 +205,7 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
     final labelLastPart = parts.last;
     final isShowReportKm = data.isShowReportKm;
     final reportKm = '${data.distance} km';
+    final packageLabel = data.packageLabel;
     final isShowBrand = data.brandTag.isNotEmpty;
     final isShowHvcvip = data.isShowHvcvip;
     final isShowDeliveryOnTime = data.needDeliverOnTime;
@@ -170,7 +219,69 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
         'Tiền cần thu: ${max(0, pickMoney - couponPickMoney - paymentWalletMoney).toString().vndFormat()}';
     final product = ' | SP: ${data.productNames.join(', ')}';
 
+    //* Dự kiến giao
+    String? estimatedDeliveryTime;
+    final dateToDelayDeliver = data.dateToDelayDeliver;
+    if (dateToDelayDeliver.isNotEmpty) {
+      estimatedDeliveryTime = dateToDelayDeliver;
+    }
+
+    //* Slow order
+    String slowStr = '';
+    if (data.isSlow) {
+      slowStr = 'Chậm';
+    }
+    final remain = data.remainTime;
+    if (remain != null) {
+      final timeStr = XtPackageHelper.getRemainingTimeText(remain);
+      if (slowStr.isNotEmpty) {
+        slowStr += ' | ';
+      }
+      slowStr += timeStr;
+    }
+    final maxAppointmentTime = data.maxEstimateTime;
+    if (maxAppointmentTime != null && maxAppointmentTime.isNotEmpty) {
+      if (slowStr.isNotEmpty) {
+        slowStr += ' | ';
+      }
+      slowStr += 'Trước $maxAppointmentTime';
+    }
+
+    //* Note
+    String? noteText;
+    final note = data.note;
+    if (note != null && note.isNotEmpty) {
+      noteText = 'Ghi chú: $note';
+    }
+
+    final isDeliveryScheduleAvailable = data.deliverSession.isNotEmpty;
+    String deliverySchedule;
+    if (isDeliveryScheduleAvailable) {
+      deliverySchedule =
+          'Hẹn giao: ${data.deliverSession.toDate('yyyy-MM-dd HH:mm:ss').text('HH\'h\'mm dd/MM')}';
+    } else {
+      deliverySchedule = 'ĐH cần hẹn trước khi giao';
+    }
+
+    //* Import station
+    String? importStationText;
+    final importStation = data.importStation;
+    if (importStation.isNotEmpty) {
+      importStationText = importStation;
+    }
+
+    //* Image
     final imageUrl = data.imageUrl;
+
+    //* Action bar
+    final isAvailable = data.isAvailable == 1;
+    final isShowCheckCustomer = data.isShowCheckCustomer;
+    final isShowQrAction = data.isShowQrAction;
+    final iconButtonActions = [
+      (widget.chatAction, Icons.chat, true),
+      (widget.callAction, Icons.call, true),
+      (widget.scanQRAction, Icons.qr_code_2, isShowQrAction),
+    ];
 
     //* Components
     final textButtonStyle = TextButton.styleFrom(
@@ -178,6 +289,15 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
         fontWeight: FontWeight.w700,
       ),
       foregroundColor: Colors.green,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(4.0),
+      ),
+    );
+    final disableTextButtonStyle = TextButton.styleFrom(
+      textStyle: textTheme.labelMedium?.copyWith(
+        fontWeight: FontWeight.w700,
+      ),
+      foregroundColor: Colors.grey,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4.0),
       ),
@@ -236,12 +356,26 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
           ],
           detailTextLabel: XtTagRow(
             data: [
-              XtTagModel(tag: 'Đơn gom'),
+              if (isShowPackageForwardingTag) XtTagModel(tag: 'Đơn gom'),
               if (isShowXFastTag)
                 XtTagModel(tag: xFastTag, color: Colors.orange.shade300),
             ],
           ),
         ),
+        if (packageLabel.isNotEmpty)
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Text(
+                  packageLabel,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(height: 4.0),
+            ],
+          ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: XtTagGrid(
@@ -272,7 +406,6 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
                 'KH đã thanh toán',
                 style: TextStyle(
                   color: Colors.green,
-                  fontSize: 12,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -342,7 +475,7 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
                     padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
                     child: Container(
                       width: 1,
-                      color: Colors.grey,
+                      color: Colors.grey.shade300,
                     ),
                   ),
                 ),
@@ -427,51 +560,82 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
                       ],
                     ),
                   ),
-                  Text(
-                    "Chậm",
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 14.0,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    "Ghi chú: ",
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 14.0,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "ĐH cần hẹn trước khi giao",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 14.0,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                  if (estimatedDeliveryTime != null)
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                              text: 'Dự kiến giao: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              )),
+                          TextSpan(
+                            text: estimatedDeliveryTime,
+                          ),
+                        ],
                       ),
-                      Icon(
-                        Icons.chevron_right,
-                        size: 24.0,
-                        color: Colors.red,
-                      )
-                    ],
-                  ),
-                  Text(
-                    'BC nhập kho: ',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  if (slowStr.isNotEmpty)
+                    Text(
+                      slowStr,
+                      style: const TextStyle(
+                        color: Colors.red,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  if (noteText != null)
+                    Text(
+                      noteText,
+                      style: const TextStyle(
+                        color: Colors.red,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  if (data.isXFast == 1)
+                    Row(
+                      children: [
+                        Text(
+                          deliverySchedule,
+                          style: TextStyle(
+                            color: isDeliveryScheduleAvailable
+                                ? Colors.black
+                                : Colors.red,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (!isDeliveryScheduleAvailable)
+                          Row(
+                            children: [
+                              const SizedBox(width: 4.0),
+                              IconButton(
+                                  onPressed: () {},
+                                  icon: const Icon(
+                                    Icons.chevron_right,
+                                    size: 24.0,
+                                    color: Colors.red,
+                                  ))
+                            ],
+                          ),
+                      ],
+                    ),
+                  if (importStationText != null)
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                              text: 'BC nhập kho: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              )),
+                          TextSpan(
+                            text: importStationText,
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -498,6 +662,7 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
                 )
               : null,
         ),
+        const SizedBox(height: 4.0),
         if (isShowMap)
           // TODO: Add map here
           SizedBox(
@@ -505,73 +670,31 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
             height: estimateMapHeight,
           ),
         const SizedBox(height: 4),
-        DoingActionBar(
+        OrderActionBar(
           children: [
             TextButton(
-              style: textButtonStyle,
+              style: isAvailable ? textButtonStyle : disableTextButtonStyle,
               onPressed: widget.completeAction,
               child: const Text('Hoàn thành'),
             ),
             Expanded(
               child: TextButton(
                 style: textButtonStyle,
-                onPressed: data.isShowCheckCustomer
-                    ? widget.checkCustomerAction
-                    : null,
+                onPressed:
+                    isShowCheckCustomer ? widget.checkCustomerAction : null,
                 child: const Text('YCCK'),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: SizedBox(
-                height: 32,
-                child: RectangleIconButton(
-                  onPressed: widget.chatAction,
-                  icon: const Icon(
-                    Icons.chat,
-                    size: 16,
-                    color: Colors.green,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: SizedBox(
-                height: 32,
-                child: RectangleIconButton(
-                  onPressed: widget.callAction,
-                  icon: const Icon(
-                    Icons.call,
-                    size: 16,
-                    color: Colors.green,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: SizedBox(
-                height: 32,
-                child: RectangleIconButton(
-                  onPressed: widget.scanQRAction,
-                  icon: const Icon(
-                    Icons.qr_code_2,
-                    size: 16,
-                    color: Colors.green,
-                  ),
-                ),
-              ),
-            ),
+            ..._buildActionBarIconButtons(iconButtonActions),
           ],
         ),
-        if (data.isShowCheckCustomer)
-          ColoredBox(
-            color: Colors.orange,
-            child: SizedBox(width: selfWidth, height: 100),
-          ),
       ],
     );
+  }
+
+  //* Mini tasks
+  Color hexToColor(String hex) {
+    return Color(int.parse(hex.substring(1, 7), radix: 16) + 0xAA000000);
   }
 
   void _viewMap() {
@@ -580,9 +703,28 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
     });
   }
 
-  void _reportKm() {}
+  List<Widget> _buildActionBarIconButtons(
+      List<(void Function()?, IconData, bool)> data) {
+    return data
+        .where((item) => item.$3)
+        .map((item) => _buildActionBarIconButton(item))
+        .toList();
+  }
 
-  Color hexToColor(String hex) {
-    return Color(int.parse(hex.substring(1, 7), radix: 16) + 0xAA000000);
+  Widget _buildActionBarIconButton((void Function()?, IconData, bool) item) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: SizedBox(
+        height: 32,
+        child: RectangleIconButton(
+          onPressed: item.$1,
+          icon: Icon(
+            item.$2,
+            size: 16,
+            color: Colors.green,
+          ),
+        ),
+      ),
+    );
   }
 }

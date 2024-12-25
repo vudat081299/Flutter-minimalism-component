@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:study_flutter/xteam_dev/components/doing_action_bar.dart';
+import 'package:study_flutter/xteam_dev/components/order_action_bar.dart';
 import 'package:study_flutter/xteam_dev/components/rectangle_icon_button.dart';
 import 'package:study_flutter/xteam_dev/components/xt_color_tag.dart';
 import 'package:study_flutter/xteam_dev/components/xt_common_row.dart';
@@ -21,7 +21,7 @@ abstract class DoingPickupOrderData {
 
   int get isXFast;
   int? get collectMoney; // data.getTotalPrepay() + data.shopDebtBill
-  int? get overtime;
+  int? get remainTime;
 
   bool get isShowReportKm;
   bool get isPackageConnection;
@@ -82,7 +82,7 @@ class DoingPickupOrderModel implements DoingPickupOrderData {
   String get intentPickupTime => '08:00';
 
   @override
-  int get overtime => 1200;
+  int get remainTime => 1200;
 
   @override
   String get imageUrl => 'https://';
@@ -163,7 +163,7 @@ class _DoingPickupOrderState extends State<DoingPickupOrder> {
     if (data.isSlow) {
       slowStr = 'Chậm';
     }
-    final overtime = data.overtime;
+    final overtime = data.remainTime;
     if (overtime != null) {
       final timeStr = XtPackageHelper.getRemainingTimeText(overtime);
       if (slowStr != null && slowStr.isNotEmpty) {
@@ -381,7 +381,7 @@ class _DoingPickupOrderState extends State<DoingPickupOrder> {
             height: estimateMapHeight,
           ),
         const SizedBox(height: 4),
-        DoingActionBar(
+        OrderActionBar(
           children: [
             TextButton(
               style: textButtonStyle,

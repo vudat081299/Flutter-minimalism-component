@@ -7,6 +7,7 @@ import 'package:study_flutter/models/ticket_manager.dart';
 import 'package:study_flutter/xteam_dev/components/xt_loading_indicator.dart';
 import 'package:study_flutter/xteam_dev/doing_delivery_order.dart';
 import 'package:study_flutter/xteam_dev/doing_pickup_order.dart';
+import 'package:study_flutter/xteam_dev/doing_task_point.dart';
 
 import 'components/minimalism_button.dart';
 import 'components/minimalism_dialog.dart';
@@ -126,11 +127,14 @@ class _AddTicketState extends State<DetailAndEditTicket> {
               // GridViewWithVariableWidthItems(),
               // ListViewWithVariableWidthItems(),
               // GridViewWithVariableWidthItems2(),
-              DoingPickupOrder(
-                data: DoingPickupOrderModel(),
-              ),
+              // DoingPickupOrder(
+              //   data: DoingPickupOrderModel(),
+              // ),
               DoingDeliveryOrder(
                 data: DoingDeliveryOrderModel(),
+              ),
+              DoingTaskPoint(
+                data: DoingTaskPointModel(),
               ),
               // XtLoadingIndicator(
               //   child: Text('day la noi dung',

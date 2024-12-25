@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:study_flutter/xteam_dev/components/xt_common_row.dart';
 
 //  ______________________________________________________
 // |                                                      |
-// | Row[                                                |
+// | Row[                                                 |
 // | Column[image] | Column[Addess, this address is very  |
 // |               |        long so we..]]                |
 // |______________________________________________________|

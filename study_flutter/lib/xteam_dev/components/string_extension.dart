@@ -1,3 +1,8 @@
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 extension VietnameseCurrencyFormatterExtensions on String {
   /// Sample: '-1000000.234' => '-1,000,000.234 đ'
   /// Sample: '1000000.234' => '1,000,000.234 đ'
@@ -69,5 +74,29 @@ extension VietnameseCurrencyFormatterExtensions on String {
 extension SensitiveInformationFilterExtensions on String {
   String sensitiveFilterPhoneNumber() {
     return this;
+  }
+}
+
+extension TransformStringExtension on String {
+  DateTime toDate(String formatString) {
+    final format = DateFormat(formatString);
+    return format.parse(this);
+  }
+
+  Color get hexColor {
+    if (length == 7) {
+      return Color(int.parse(substring(1, 7), radix: 16) + 0xFF000000);
+    } else if (length == 6) {
+      return Color(int.parse(substring(0, 6), radix: 16) + 0xFF000000);
+    }
+    return Colors.white;
+  }
+
+  int? get toInt {
+    return int.tryParse(this);
+  }
+
+  int get toIntOrZero {
+    return int.tryParse(this) ?? 0;
   }
 }

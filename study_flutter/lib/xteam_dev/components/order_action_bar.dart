@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class DoingActionBar extends StatelessWidget {
-  const DoingActionBar({
+class OrderActionBar extends StatelessWidget {
+  const OrderActionBar({
     super.key,
     required this.children,
   });
@@ -21,7 +21,7 @@ class DoingActionBar extends StatelessWidget {
             ],
           ),
         ),
-        const Divider(thickness: 0.5, height: 0.5),
+        const Divider(thickness: 2, height: 2),
       ],
     );
   }
