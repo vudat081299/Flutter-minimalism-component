@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -73,7 +71,16 @@ extension VietnameseCurrencyFormatterExtensions on String {
 
 extension SensitiveInformationFilterExtensions on String {
   String sensitiveFilterPhoneNumber() {
-    return this;
+    if (length <= 7) {
+      return this;
+    }
+    const prefixTextLength = 3;
+    const suffixTextLength = 4;
+    return [
+      substring(0, prefixTextLength),
+      '***',
+      substring(length - suffixTextLength),
+    ].join();
   }
 }
 
@@ -99,4 +106,9 @@ extension TransformStringExtension on String {
   int get toIntOrZero {
     return int.tryParse(this) ?? 0;
   }
+}
+
+extension ConditionExtension on String? {
+  bool get isValuable => this != null && this!.isNotEmpty;
+  bool get isWorthless => this == null || this!.isEmpty;
 }

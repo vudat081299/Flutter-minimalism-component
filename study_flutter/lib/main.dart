@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:study_flutter/models/ticket_manager.dart';
 
 import 'home.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,12 +35,12 @@ class _MyHomePageState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
       theme: ThemeData(
-        textTheme: GoogleFonts.poppinsTextTheme(
-          Theme.of(context).textTheme.apply(
-                bodyColor: Colors.black,
-                displayColor: Colors.black,
-              ),
-        ),
+        // textTheme: GoogleFonts.poppinsTextTheme(
+        //   Theme.of(context).textTheme.apply(
+        //         bodyColor: Colors.black,
+        //         displayColor: Colors.black,
+        //       ),
+        // ),
         brightness: Brightness.light,
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
@@ -60,12 +60,12 @@ class _MyHomePageState extends State<MyApp> {
         ),
       ),
       darkTheme: ThemeData(
-        textTheme: GoogleFonts.poppinsTextTheme(
-          Theme.of(context).textTheme.apply(
-                bodyColor: Colors.white,
-                displayColor: Colors.white,
-              ),
-        ),
+        // textTheme: GoogleFonts.poppinsTextTheme(
+        //   Theme.of(context).textTheme.apply(
+        //         bodyColor: Colors.white,
+        //         displayColor: Colors.white,
+        //       ),
+        // ),
         brightness: Brightness.dark,
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.black,

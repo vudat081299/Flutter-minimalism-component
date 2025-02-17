@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:study_flutter/GAM/receipt_note/receipt_note.dart';
+import 'package:study_flutter/GAM/receipt_note/widgets/information_section.dart';
 
 import 'package:study_flutter/components/minimalism_textfield.dart';
 import 'package:study_flutter/models/ticket_manager.dart';
 import 'package:study_flutter/xteam_dev/components/xt_loading_indicator.dart';
 import 'package:study_flutter/xteam_dev/doing_delivery_order.dart';
+import 'package:study_flutter/xteam_dev/doing_export_package.dart';
 import 'package:study_flutter/xteam_dev/doing_pickup_order.dart';
 import 'package:study_flutter/xteam_dev/doing_task_point.dart';
+import 'package:study_flutter/xteam_dev/next_order.dart';
 
 import 'components/minimalism_button.dart';
 import 'components/minimalism_dialog.dart';
@@ -130,12 +134,22 @@ class _AddTicketState extends State<DetailAndEditTicket> {
               // DoingPickupOrder(
               //   data: DoingPickupOrderModel(),
               // ),
-              DoingDeliveryOrder(
-                data: DoingDeliveryOrderModel(),
-              ),
-              DoingTaskPoint(
-                data: DoingTaskPointModel(),
-              ),
+              // DoingDeliveryOrder(
+              //   data: DoingDeliveryOrderModel(),
+              // ),
+              // DoingExportPackage(
+              //   data: DoingExportPackageModel(),
+              // ),
+              // XtNextOrder()
+              InformationSection(
+                data: InfomrationSectionData(
+                    needImport: 'dfasdf',
+                    imported: 'fsdfasdf',
+                    station: 'dfasdfasdf',
+                    creator: 'sdfasdfasdf',
+                    status: 'fasdfasdfasdfs',
+                    completedAt: 'completedAt'),
+              )
               // XtLoadingIndicator(
               //   child: Text('day la noi dung',
               //       style: TextStyle(color: Colors.black)),

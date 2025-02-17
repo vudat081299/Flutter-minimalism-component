@@ -322,6 +322,7 @@ class _DoingDeliveryOrderState extends State<DoingDeliveryOrder> {
                           style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
+                            backgroundColor: Colors.orange,
                           )),
                       TextSpan(
                         text: labelLastPart,

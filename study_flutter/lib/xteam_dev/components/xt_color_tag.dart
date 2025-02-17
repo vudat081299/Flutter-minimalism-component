@@ -5,11 +5,15 @@ class XtColorTag extends StatelessWidget {
     super.key,
     required this.child,
     this.color = Colors.orange,
+    this.borderRadius = 4,
+    this.padding = const EdgeInsets.all(4),
     this.onPressed,
   });
 
   final Widget? child;
   final Color? color;
+  final double borderRadius;
+  final EdgeInsets padding;
 
   final VoidCallback? onPressed;
 
@@ -18,15 +22,15 @@ class XtColorTag extends StatelessWidget {
     return Ink(
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: InkWell(
         splashColor: color,
         highlightColor: color?.withAlpha(0),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(borderRadius),
         onTap: onPressed,
         child: Padding(
-          padding: const EdgeInsets.all(4.0),
+          padding: padding,
           child: child,
         ),
       ),
